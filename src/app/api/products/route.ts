@@ -2,13 +2,16 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        // ✅ validate id trước
-        if (!params?.id || !ObjectId.isValid(params.id)) {
+        const { id } = await context.params;
+
+        if (!id || !ObjectId.isValid(id)) {
             return NextResponse.json(
                 { error: "Invalid ID" },
                 { status: 400 }
@@ -19,7 +22,7 @@ export async function GET(
         const db = client.db();
 
         const product = await db.collection("products").findOne({
-            _id: new ObjectId(params.id),
+            _id: new ObjectId(id),
         });
 
         return NextResponse.json(product);
