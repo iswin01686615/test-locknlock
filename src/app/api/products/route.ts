@@ -13,8 +13,11 @@ export async function GET() {
             .find({})
             .toArray();
 
-        return NextResponse.json(products);
+        // 🔥 đảm bảo luôn trả array
+        return NextResponse.json(products || []);
     } catch (err) {
+        console.error("API ERROR:", err);
+
         return NextResponse.json(
             { error: "Server error" },
             { status: 500 }
