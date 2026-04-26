@@ -6,10 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
     req: Request,
-    context: { params: Promise<{ id: string }> }
+    context: { params: Promise<any> } // 👈 KHÔNG ép type
 ) {
     try {
-        const { id } = await context.params;
+        const params = await context.params;
+        const id = params?.id;
 
         if (!id || !ObjectId.isValid(id)) {
             return NextResponse.json(
