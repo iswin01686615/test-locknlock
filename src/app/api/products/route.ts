@@ -1,32 +1,19 @@
 import { NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-    req: Request,
-    context: { params: Promise<any> } // 👈 KHÔNG ép type
-) {
+export async function GET() {
     try {
-        const params = await context.params;
-        const id = params?.id;
-
-        if (!id || !ObjectId.isValid(id)) {
-            return NextResponse.json(
-                { error: "Invalid ID" },
-                { status: 400 }
-            );
-        }
-
         const client = await clientPromise;
         const db = client.db();
 
-        const product = await db.collection("products").findOne({
-            _id: new ObjectId(id),
-        });
+        const products = await db
+            .collection("products")
+            .find({})
+            .toArray();
 
-        return NextResponse.json(product);
+        return NextResponse.json(products);
     } catch (err) {
         return NextResponse.json(
             { error: "Server error" },
